@@ -5,7 +5,7 @@ This is a simple string parser. It handles an environment full of variables, and
 * golang
 
 ## Installation
-Simply `import "github.com/brimstnoe/go-parser"` in your project.
+Simply `import "github.com/brimstone/go-parser"` in your project.
 
 ## Usage
 ```go
