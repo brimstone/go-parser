@@ -63,11 +63,12 @@ func TestErr(t *testing.T) {
 		"0<garbage",
 		"garbage>0",
 		"0>garbage",
+		"other trash",
 	}
 	for _, test := range tests {
 		_, err := Parse(make(Env), test)
 		if err == nil {
-			t.Errorf("garbage input didn't produce error")
+			t.Errorf("garbage input '%s', didn't produce error", test)
 		}
 	}
 }
