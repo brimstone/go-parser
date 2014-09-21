@@ -166,7 +166,7 @@ TokenCheck:
 		}
 	}
 
-// Handle if the last element is an integer
+	// Handle if the last element is an integer
 	itemInt, err := strconv.Atoi(tokens[0])
 	if err == nil {
 		if itemInt == 0 {
@@ -176,13 +176,13 @@ TokenCheck:
 		}
 	}
 
-// We should now be down to simply true or false
+	// We should now be down to simply true or false
 	switch tokens[0] {
 	case "true":
 		return true, nil
 	case "false":
 		return false, nil
 	}
-// Only invalid tokens should be this far.
+	// Only invalid tokens should be this far.
 	return false, fmt.Errorf("Error parsing '%s'", tokens[0])
 }
