@@ -27,7 +27,15 @@ func resolveEnv(env Env, token string) string {
 }
 
 func Parse(env Env, input string) (bool, error) {
-	tokenExp := regexp.MustCompile("[0-9]+|[-+]|[a-z]+|[=<>]|[|&]")
+	// Handle:
+	// - numbers
+	// - letters (assuming they're variables in the environment
+	// - equal signs, equivalence
+	// - less than
+	// - greater than
+	// - boolean OR
+	// - boolean AND
+	tokenExp := regexp.MustCompile("[0-9]+|[a-z]+|[=<>]|[|&]")
 	tokens := tokenExp.FindAllString(input, -1)
 
 	// easy out
