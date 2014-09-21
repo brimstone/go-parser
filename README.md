@@ -23,3 +23,10 @@ func main() {
 	fmt.Println(parser.Parse(env, "bar=0|foo"))
 }
 ```
+
+## Known issues
+* no order of operations. I think I'm going to handle this via levels, counting down, and replace the clean variable
+* no real string handling
+* no integer math
+* no negative numbers
+* no unequal operator
