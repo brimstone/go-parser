@@ -44,12 +44,13 @@ func Parse(env Env, input string) (bool, error) {
 	}
 	// Attempt to loop through our tokens until we can reduce our tokens to 1
 
-	dirty := false
+	clean := false
 TokenCheck:
-	for dirty == false && len(tokens) > 1 {
+	for clean != true && len(tokens) > 1 {
+		clean = true
 		for i, _ := range tokens {
 			// check dualnary operators
-			if i > 0 && len(tokens) > i {
+			if i > 0 && len(tokens) > i+1 {
 				left := resolveEnv(env, tokens[i-1])
 				right := resolveEnv(env, tokens[i+1])
 				switch tokens[i] {
@@ -62,7 +63,7 @@ TokenCheck:
 					} else {
 						tokens[i-1] = "false"
 					}
-					dirty = true
+					clean = false
 					tokens = append(tokens[:i], tokens[i+2:]...)
 					break TokenCheck
 				case "<":
@@ -82,7 +83,7 @@ TokenCheck:
 					} else {
 						tokens[i-1] = "false"
 					}
-					dirty = true
+					clean = false
 					tokens = append(tokens[:i], tokens[i+2:]...)
 					break TokenCheck
 				case ">":
@@ -102,12 +103,12 @@ TokenCheck:
 					} else {
 						tokens[i-1] = "false"
 					}
-					dirty = true
+					clean = false
 					tokens = append(tokens[:i], tokens[i+2:]...)
 					break TokenCheck
 				case "|":
 					if left == "true" {
-						dirty = true
+						clean = false
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
 						break TokenCheck
@@ -115,7 +116,7 @@ TokenCheck:
 						return false, fmt.Errorf("Expected 'true' or 'false', found", left)
 					}
 					if right == "true" {
-						dirty = true
+						clean = false
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
 						break TokenCheck
@@ -124,7 +125,7 @@ TokenCheck:
 					}
 				case "&":
 					if left == "true" && right == "true" {
-						dirty = true
+						clean = false
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
 						break TokenCheck
@@ -135,7 +136,7 @@ TokenCheck:
 					if right != "false" && right != "true" {
 						return false, fmt.Errorf("Expected 'true' or 'false', found '%s'", right)
 					}
-					dirty = true
+					clean = false
 					tokens[i-1] = "false"
 					tokens = append(tokens[:i], tokens[i+2:]...)
 					break TokenCheck
@@ -144,6 +145,8 @@ TokenCheck:
 		}
 	}
 
+	// Now that we've reduced our tokens to only one element,
+	// figure out what it is and return properly
 	if item, ok := env[tokens[0]]; ok {
 		switch t := item.(type) {
 		case int:
@@ -162,6 +165,8 @@ TokenCheck:
 			}
 		}
 	}
+
+// Handle if the last element is an integer
 	itemInt, err := strconv.Atoi(tokens[0])
 	if err == nil {
 		if itemInt == 0 {
@@ -171,13 +176,13 @@ TokenCheck:
 		}
 	}
 
-	// Now that we've reduced our tokens to only one element,
-	// figure out what it is and return properly
+// We should now be down to simply true or false
 	switch tokens[0] {
 	case "true":
 		return true, nil
 	case "false":
 		return false, nil
 	}
+// Only invalid tokens should be this far.
 	return false, fmt.Errorf("Error parsing '%s'", tokens[0])
 }
