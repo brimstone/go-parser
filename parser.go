@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	//"github.com/davecgh/go-spew/spew"
 	"regexp"
 	"strconv"
 )
@@ -30,8 +29,6 @@ func resolveEnv(env Env, token string) string {
 func Parse(env Env, input string) (bool, error) {
 	tokenExp := regexp.MustCompile("[0-9]+|[-+]|[a-z]+|[=<>]|[|&]")
 	tokens := tokenExp.FindAllString(input, -1)
-	fmt.Println(tokens)
-	//spew.Dump(tokens)
 
 	// easy out
 	if len(tokens) == 0 {
@@ -43,7 +40,6 @@ func Parse(env Env, input string) (bool, error) {
 TokenCheck:
 	for dirty == false && len(tokens) > 1 {
 		for i, _ := range tokens {
-			fmt.Println("Evaluating", i)
 			// check dualnary operators
 			if i > 0 && len(tokens) > i {
 				left := resolveEnv(env, tokens[i-1])
@@ -106,7 +102,6 @@ TokenCheck:
 						dirty = true
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
-						//spew.Dump(tokens)
 						break TokenCheck
 					} else if left != "false" {
 						return false, fmt.Errorf("Expected 'true' or 'false', found", left)
@@ -115,7 +110,6 @@ TokenCheck:
 						dirty = true
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
-						//spew.Dump(tokens)
 						break TokenCheck
 					} else if right != "false" {
 						return false, fmt.Errorf("Expected 'true' or 'false', found", right)
@@ -125,7 +119,6 @@ TokenCheck:
 						dirty = true
 						tokens[i-1] = "true"
 						tokens = append(tokens[:i], tokens[i+2:]...)
-						//spew.Dump(tokens)
 						break TokenCheck
 					}
 					if left != "false" && left != "true" {
@@ -137,7 +130,6 @@ TokenCheck:
 					dirty = true
 					tokens[i-1] = "false"
 					tokens = append(tokens[:i], tokens[i+2:]...)
-					//spew.Dump(tokens)
 					break TokenCheck
 				}
 			}
