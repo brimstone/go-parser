@@ -82,7 +82,25 @@ TokenCheck:
 					tokens = append(tokens[:i], tokens[i+2:]...)
 					break TokenCheck
 				case ">":
-					return false, fmt.Errorf("No greater than yet")
+					// attempt to convert left to an int
+					leftInt, err := strconv.Atoi(left)
+					if err != nil {
+						return false, fmt.Errorf("Expect type int, found", left)
+					}
+					// attempt to convert right to an int
+					rightInt, err := strconv.Atoi(right)
+					if err != nil {
+						return false, fmt.Errorf("Expect type int, found", right)
+					}
+					// do the op
+					if leftInt > rightInt {
+						tokens[i-1] = "true"
+					} else {
+						tokens[i-1] = "false"
+					}
+					dirty = true
+					tokens = append(tokens[:i], tokens[i+2:]...)
+					break TokenCheck
 				case "|":
 					if left == "true" {
 						dirty = true
@@ -123,9 +141,6 @@ TokenCheck:
 					break TokenCheck
 				}
 			}
-			//tokens = tokens[:len(tokens)-1]
-			// since we changed the length of our array, we need to break this loop
-			//break
 		}
 	}
 
@@ -146,7 +161,6 @@ TokenCheck:
 				tokens[0] = "false"
 			}
 		}
-		//tokens[0] = env[tokens[0]].(string)
 	}
 	itemInt, err := strconv.Atoi(tokens[0])
 	if err == nil {
