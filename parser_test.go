@@ -15,16 +15,29 @@ func Test(t *testing.T) {
 		{"foo", true},
 		{"bar", false},
 		{"instances=0", false},
-		{"instances=1", true},
 		{"instances<4", true},
+		{"4<instances", false},
 		{"true|false", true},
+		{"false|true", true},
+		{"true&true", true},
+		{"foo&true", true},
+		{"bar&true", false},
 		{"true&false", false},
+		{"instances=1", true},
+		{"pickles=pickles", true},
+		{"1", true},
+		{"0", false},
+		{"instances<2&foo", true},
+		{"instances", true},
+		{"zero", false},
 	}
 
 	env := make(Env)
 	env["foo"] = true
 	env["bar"] = false
 	env["instances"] = 1
+	env["zero"] = 0
+	env["pickles"] = "pickles"
 
 	for _, c := range tests {
 		got, err := Parse(env, c.input)
@@ -38,8 +51,19 @@ func Test(t *testing.T) {
 }
 
 func TestErr(t *testing.T) {
-	_, err := Parse(make(Env), "garbage")
-	if err == nil {
-		t.Errorf("garbage input didn't produce error")
+	var tests = []string{
+		"garbage",
+		"garbage|false",
+		"false|garbage",
+		"garbage&false",
+		"false&garbage",
+		"garbage<0",
+		"0<garbage",
+	}
+	for _, test := range tests {
+		_, err := Parse(make(Env), test)
+		if err == nil {
+			t.Errorf("garbage input didn't produce error")
+		}
 	}
 }

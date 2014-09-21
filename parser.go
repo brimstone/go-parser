@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
+	//"github.com/davecgh/go-spew/spew"
 	"regexp"
 	"strconv"
 )
@@ -24,7 +24,7 @@ func resolveEnv(env Env, token string) string {
 			}
 		}
 	}
-	return token //, fmt.Errorf("Don't know how to handle this")
+	return token
 }
 
 func Parse(env Env, input string) (bool, error) {
@@ -119,10 +119,8 @@ TokenCheck:
 					dirty = true
 					tokens[i-1] = "false"
 					tokens = append(tokens[:i], tokens[i+2:]...)
-					spew.Dump(tokens)
+					//spew.Dump(tokens)
 					break TokenCheck
-				default:
-					return false, fmt.Errorf("Don't know how to parse", tokens[i])
 				}
 			}
 			//tokens = tokens[:len(tokens)-1]
@@ -134,7 +132,7 @@ TokenCheck:
 	if item, ok := env[tokens[0]]; ok {
 		switch t := item.(type) {
 		case int:
-			if t == 0 {
+			if item == 0 {
 				tokens[0] = "false"
 			} else {
 				tokens[0] = "true"
@@ -150,12 +148,18 @@ TokenCheck:
 		}
 		//tokens[0] = env[tokens[0]].(string)
 	}
+	itemInt, err := strconv.Atoi(tokens[0])
+	if err == nil {
+		if itemInt == 0 {
+			tokens[0] = "false"
+		} else {
+			tokens[0] = "true"
+		}
+	}
 
 	// Now that we've reduced our tokens to only one element,
 	// figure out what it is and return properly
 	switch tokens[0] {
-	case "":
-		return true, nil
 	case "true":
 		return true, nil
 	case "false":
