@@ -26,18 +26,7 @@ func resolveEnv(env Env, token string) string {
 	return token
 }
 
-func Parse(env Env, input string) (bool, error) {
-	// Handle:
-	// - numbers
-	// - letters (assuming they're variables in the environment
-	// - equal signs, equivalence
-	// - less than
-	// - greater than
-	// - boolean OR
-	// - boolean AND
-	tokenExp := regexp.MustCompile("[0-9]+|[a-z]+|[=<>]|[|&]")
-	tokens := tokenExp.FindAllString(input, -1)
-
+func parseTokens(env Env, tokens []string) (bool, error) {
 	// easy out
 	if len(tokens) == 0 {
 		return true, nil
@@ -188,4 +177,20 @@ TokenCheck:
 	}
 	// Only invalid tokens should be this far.
 	return false, fmt.Errorf("Error parsing '%s'", tokens[0])
+}
+
+func Parse(env Env, input string) (bool, error) {
+	// Handle:
+	// - numbers
+	// - letters (assuming they're variables in the environment
+	// - equal signs, equivalence
+	// - less than
+	// - greater than
+	// - boolean OR
+	// - boolean AND
+	tokenExp := regexp.MustCompile("[0-9]+|[a-z]+|[=<>]|[|&]")
+	tokens := tokenExp.FindAllString(input, -1)
+
+	return parseTokens(env, tokens)
+
 }
