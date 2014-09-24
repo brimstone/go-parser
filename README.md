@@ -1,6 +1,16 @@
 # go-parser
 This is a simple string parser. It handles an environment full of variables, and a string to parse it down to a simple true or false boolean value.
 
+Supports:
+- 'true'
+- 'false'
+- < less than
+- > greater than
+- = Equivalence 
+- | boolean OR
+- & boolean AND
+- () Nesting expressions
+
 ## Requirements
 * golang
 
@@ -25,7 +35,6 @@ func main() {
 ```
 
 ## Known issues
-* no order of operations. I think I'm going to handle this via levels, counting down, and replace the clean variable
 * no real string handling
 * no integer math
 * no negative numbers

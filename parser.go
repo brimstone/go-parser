@@ -33,11 +33,40 @@ func parseTokens(env Env, tokens []string) (bool, error) {
 	}
 	// Attempt to loop through our tokens until we can reduce our tokens to 1
 
-	level := 2
+	level := 3
 TokenCheck:
 	for level > 0 && len(tokens) > 1 {
 		for i, _ := range tokens {
 			switch level {
+			case 3:
+				switch tokens[i] {
+				case "(":
+					parenDepth := 1
+					j := i
+					for parenDepth > 0 && j < len(tokens)-1 {
+						j++
+						switch tokens[j] {
+						case "(":
+							parenDepth++
+						case ")":
+							parenDepth--
+						}
+					}
+					if parenDepth != 0 {
+						return false, fmt.Errorf("Did not find closing paren before running out of tokens")
+					}
+					paren, err := parseTokens(env, tokens[i+1:j])
+					if err != nil {
+						return false, err
+					}
+					if paren {
+						tokens[i] = "true"
+					} else {
+						tokens[i] = "false"
+					}
+					tokens = append(tokens[:i+1], tokens[j+1:]...)
+					break TokenCheck
+				}
 			case 2:
 				// check dualnary operators
 				if i > 0 && len(tokens) > i+1 {
@@ -188,7 +217,7 @@ func Parse(env Env, input string) (bool, error) {
 	// - greater than
 	// - boolean OR
 	// - boolean AND
-	tokenExp := regexp.MustCompile("[0-9]+|[a-z]+|[=<>]|[|&]")
+	tokenExp := regexp.MustCompile("[0-9]+|[a-z]+|[=<>]|[|&]|[()]")
 	tokens := tokenExp.FindAllString(input, -1)
 
 	return parseTokens(env, tokens)

@@ -32,6 +32,8 @@ func Test(t *testing.T) {
 		{"instances<2&foo", true},
 		{"instances", true},
 		{"zero", false},
+		{"true&(false|true)", true},
+		{"true&((false)&true)", true},
 	}
 
 	env := make(Env)
@@ -64,6 +66,8 @@ func TestErr(t *testing.T) {
 		"garbage>0",
 		"0>garbage",
 		"other trash",
+		"junk(",
+		"junk(garbage)",
 	}
 	for _, test := range tests {
 		_, err := Parse(make(Env), test)
